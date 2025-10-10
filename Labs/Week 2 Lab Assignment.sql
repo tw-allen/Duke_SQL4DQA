@@ -25,6 +25,15 @@
 
 -- 1. Write a query that returns all columns and all rows from the lineitem table along with the part type and part name columns --
 
+SELECT
+	l.*
+    , p.p_type
+    , p.p_name
+FROM
+	lineitem l
+    LEFT JOIN part p
+		ON l.l_partkey = p.p_partkey;
+
 
 
 
@@ -33,7 +42,16 @@
 -- 2. Write a query that returns all columns and all rows from the lineitem table along with --
 -- the order priority (name this column "Priority") and the supplier address (name this column "Address") --
 
-
+SELECT
+	l.*
+    , o.o_orderpriority AS "Priority"
+    , s.s_address AS "Address"
+FROM
+	lineitem l
+    LEFT JOIN orders o
+		ON l.l_orderkey = o.o_orderkey
+	LEFT JOIN supplier s
+		ON l.l_suppkey = s.s_suppkey;
 
 
 
@@ -49,21 +67,57 @@
 
 -- 4. Write a query that returns a customers name and their most recent order date (every customer in the database should be included) --
 
-
-
+SELECT
+	c.c_name
+    , MAX(o.o_orderdate)
+FROM
+	customer c
+    LEFT JOIN orders o
+		ON c.c_custkey = o.o_custkey
+GROUP BY 
+	1;
 
 
 
 -- 5. Write a query that returns count of "URGENT" orders per delivery nation for orders in 1995.  Order results by total orders descending--
 
-
-
+SELECT
+	n.n_name
+	, COUNT(*)
+FROM
+	orders o
+    LEFT JOIN customer c
+		ON c.c_custkey = o.o_custkey
+	LEFT JOIN nation n
+		ON n.n_nationkey = c.c_nationkey
+WHERE
+	o.o_orderpriority = "1-URGENT"
+    AND YEAR(o.o_orderdate) = 1995
+GROUP BY
+	1
+ORDER BY
+	2 DESC;
+    
 
 
 
 -- 6. Using set logic return all rows in the line item table where ship mode is truck and line status is F --
 
+SELECT
+	*
+FROM
+	lineitem
+WHERE
+	l_shipmode = "TRUCK"
+    
+INTERSECT
 
+SELECT
+	*
+FROM
+	lineitem
+WHERE
+	l_linestatus = "F";
 
 
 
@@ -84,6 +138,36 @@
 
 -- 9. Write a query that returns a list of nations that product "hot spring dodger dim light" was mailed to(shipping mode) --
 
+-- SELECT
+-- 	n.n_name
+-- FROM
+-- 	nation n
+--     LEFT JOIN supplier s
+-- 		ON s.s_nationkey = n.n_nationkey
+-- 	LEFT JOIN lineitem l
+-- 		ON s.s_suppkey = l.l_suppkey
+-- 	LEFT JOIN part p
+-- 		ON l.l_partkey = p.p_partkey
+-- WHERE
+-- 	l.l_shipmode = "MAIL"
+--     AND p.p_name = "hot spring dodger dim light";
+    
+    
+SELECT DISTINCT
+	n.n_name
+FROM
+	part p
+    LEFT JOIN lineitem l
+		ON l.l_partkey = p.p_partkey
+	LEFT JOIN orders o
+		ON l.l_orderkey = o.o_orderkey
+	LEFT JOIN customer c
+		ON c.c_custkey = o.o_custkey
+	LEFT JOIN nation n
+		ON c.c_nationkey = n.n_nationkey
+WHERE
+	p.p_name = "hot spring dodger dim light"
+    AND l.l_shipmode = "MAIL";
 		
 
 
