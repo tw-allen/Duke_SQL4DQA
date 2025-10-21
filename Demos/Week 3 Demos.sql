@@ -1,17 +1,18 @@
 -- ------------------------------------------------------------------------------------------- --
--- --------------------------------------- Week 5 Demos -------------------------------------- --
+-- --------------------------------------- Week 3 Demos -------------------------------------- --
 -- ------------------------------------------------------------------------------------------- --
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
--- -- -- -- --  Demo Set 5.1  -- -- -- -- --
+-- -- -- -- --  Demo Set 3.1  -- -- -- -- --
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
 -- 1. Create a table called person that has the columns person_id, firstname, and age.  Person_id is the primary key  --
-CREATE TABLE person
+CREATE TABLE person_c
 	(
     person_id SMALLINT(11),
     firstname VARCHAR(20),
     age INT(11),
+    gender varchar(1),
     CONSTRAINT pk_person PRIMARY KEY (person_id)
     );
     
@@ -24,7 +25,7 @@ CREATE TABLE person
 
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
--- -- -- -- --  Demo Set 5.2  -- -- -- -- --
+-- -- -- -- --  Demo Set 3.2  -- -- -- -- --
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- --    
     
 -- 1. Insert rows into the person table for Bill who is 24 years old and Margory who is 31 years old.  --
@@ -43,7 +44,7 @@ VALUES
     
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
--- -- -- -- --  Demo Set 5.3  -- -- -- -- --
+-- -- -- -- --  Demo Set 3.3  -- -- -- -- --
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
 -- 1. Let's update the data.  Turns out Bill is actually 23 and he likes to go by William --
@@ -63,7 +64,7 @@ WHERE
     
     
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
--- -- -- -- --  Demo Set 5.4  -- -- -- -- --
+-- -- -- -- --  Demo Set 3.4  -- -- -- -- --
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
     
  
@@ -80,7 +81,7 @@ WHERE person_id = 1;
     
     
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
--- -- -- -- --  Demo Set 5.5  -- -- -- -- --
+-- -- -- -- --  Demo Set 3.5  -- -- -- -- --
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
  
 -- 1. Use the DESCRIBE statement to examine the charge table in the Credit database --     
@@ -95,7 +96,7 @@ DESCRIBE charge;
     
     
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
--- -- -- -- --  Demo Set 5.6  -- -- -- -- --
+-- -- -- -- --  Demo Set 3.6  -- -- -- -- --
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
 -- 1. Return a list of all tables in the Credit database (schema) --
@@ -133,8 +134,10 @@ WHERE
     
     
 -- 4. Return a list of all tables in the Credit database (schema) that have 'member' information in them --
-SELECT DISTINCT
-	TABLE_NAME
+-- SELECT DISTINCT
+-- 	TABLE_NAME
+SELECT
+	*
 FROM
 	information_schema.columns
 WHERE
@@ -152,7 +155,7 @@ WHERE
 
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
--- -- -- -- --  Demo Set 5.7  -- -- -- -- --
+-- -- -- -- --  Demo Set 3.7  -- -- -- -- --
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
 -- 1. Create a View that holds aggregated monthly charge amount figures at the member number level --
