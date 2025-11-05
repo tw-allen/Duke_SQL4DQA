@@ -15,8 +15,29 @@
 -- 1. Using the draft table in Basketball_women, return the school that had the most players drafted into the WNBA league  --
 -- for each year.  If there is a tie, return the school that had the lowest average 'draftOverall' value for --
 -- that year.  Output should include only 2 columns, year and school. --
-
-
+WITH T1 AS (
+	SELECT
+		draftYear
+        , draftFrom
+        , COUNT(*) AS total_drafted
+        , AVG(draftOverall) AS avg_place_drafted
+        , RANK() OVER (PARTITION BY draftYear ORDER BY COUNT(*) DESC, AVG(draftOverall)) AS draft_rank
+	FROM
+		draft
+	WHERE
+		lgID = "WNBA"
+	GROUP BY
+		1, 2
+	ORDER BY
+		1, 3 DESC, 4
+)
+SELECT
+	draftYear
+    , draftFrom
+FROM
+	T1
+WHERE
+	draft_rank = 1;
 
 
 
@@ -25,16 +46,79 @@
 -- 2. Use the Credit database. I have a theory that months that saw growth in average charge amount from the previous month have a higher --
 -- percentage of category 7 charges than months that saw decline.  Please return percentage of category 7 charges for months that saw -- 
 -- growth in average charge amount as well as those that saw decline --
-
-
-
+WITH T1 AS (
+	SELECT
+		MONTH(charge_dt) AS charge_month
+        , SUM(charge_amt) AS total_charge_amount
+        , AVG(charge_amt) AS avg_charge_amount
+        , COUNT(*) AS charge_count
+        , SUM(category_no = 7) AS total_cat7_charges
+	FROM
+		charge
+	GROUP BY
+		1
+),
+T2 AS (
+	SELECT
+		*
+        , CASE
+			WHEN avg_charge_amount > (LAG(avg_charge_amount, 1) OVER (ORDER BY charge_month))
+				THEN "Growth"
+			WHEN avg_charge_amount < (LAG(avg_charge_amount, 1) OVER (ORDER BY charge_month))
+				THEN "Decline"
+			ELSE "NA" END
+            AS growth_group
+	FROM
+		T1
+)
+SELECT
+	growth_group
+    , (SUM(total_cat7_charges) / SUM(charge_count)) * 100 AS cat7_pcts
+FROM
+	T2
+GROUP BY
+	1;
 
 
 
 -- 3. Use the Credit database.  The credit card company likes to mail special offers to members who were in the first $1,000,000 of the company's charges --
 -- each month.  Return the count of how many offers must be mailed to each region each month.  A member should be only sent 1 offer per month.  Please --
 -- order results by month and then by offers sent descending --
-
+WITH T1 AS (
+	SELECT
+		c.charge_amt
+        , c.charge_dt
+        , c.member_no
+        , r.region_name
+        , MONTH(c.charge_dt) AS charge_month
+        , SUM(c.charge_amt) OVER (PARTITION BY MONTH(c.charge_dt) ORDER BY c.charge_dt ROWS UNBOUNDED PRECEDING) AS running_total
+	FROM
+		charge c
+        LEFT JOIN member m
+			ON c.member_no = m.member_no
+		LEFT JOIN region r
+			ON m.region_no = r.region_no
+),
+T2 AS (
+	SELECT DISTINCT
+		charge_month
+        , member_no
+        , region_name
+	FROM
+		T1
+	WHERE
+		running_total < 1000000
+)
+SELECT
+	charge_month
+    , region_name
+    , COUNT(*) AS offers_sent
+FROM
+	T2
+GROUP BY
+	1, 2
+ORDER BY
+	1, 3 DESC;
 	
  
 
